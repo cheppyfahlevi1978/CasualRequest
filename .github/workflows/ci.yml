@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Typecheck, lint, SQL and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      # Build-time placeholders only. Real values live in Vercel environment
+      # variables; nothing secret belongs in CI for a build-only job.
+      NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: sb_publishable_placeholder
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NEXT_PUBLIC_APP_ENV: preview
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Verify SQL migrations
+        run: npm run verify:sql
+
+      - name: Build
+        run: npm run build
+
+  migrations:
+    name: Review database migrations
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: List migrations changed in this PR
+        run: |
+          echo "Migrations touched by this pull request:"
+          git diff --name-only origin/${{ github.base_ref }}...HEAD -- supabase/migrations || true
+          echo
+          echo "Production migrations are applied by the deploy workflow after"
+          echo "this pull request is merged, never automatically from a preview."

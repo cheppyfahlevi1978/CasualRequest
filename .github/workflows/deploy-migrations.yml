@@ -1,0 +1,60 @@
+name: Apply database migrations
+
+# Production schema changes go through a controlled, reviewable pipeline —
+# never by hand in the dashboard (PRD §45, §69, "CI/CD" section).
+on:
+  push:
+    branches: [main]
+    paths:
+      - "supabase/migrations/**"
+  workflow_dispatch:
+
+jobs:
+  migrate:
+    name: supabase db push
+    runs-on: ubuntu-latest
+    # Configure this environment in GitHub with required reviewers so a human
+    # approves every production schema change.
+    environment: production
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link project
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}"
+
+      - name: Show pending migrations
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: supabase migration list --linked
+
+      - name: Apply migrations
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: supabase db push --linked
+
+      - name: Smoke test the health endpoint
+        run: |
+          for i in 1 2 3 4 5; do
+            code=$(curl -s -o /tmp/health.json -w "%{http_code}" "${{ secrets.PRODUCTION_URL }}/api/health" || true)
+            echo "attempt $i -> HTTP $code"
+            cat /tmp/health.json || true
+            echo
+            if [ "$code" = "200" ]; then exit 0; fi
+            sleep 10
+          done
+          echo "Health endpoint did not return 200."
+          exit 1
