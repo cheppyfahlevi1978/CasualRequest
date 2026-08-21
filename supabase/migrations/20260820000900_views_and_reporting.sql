@@ -239,17 +239,27 @@ by_status as (
   ) x
 ),
 cost_trend as (
-  select coalesce(jsonb_agg(x order by x.bucket), '[]'::jsonb) as data
+  -- Budget is joined via LATERAL rather than a correlated subquery in the
+  -- SELECT list: Postgres rejects a subquery that references p.work_date
+  -- when the outer query is grouped by an expression derived from it
+  -- (grouping by position 1 does not establish functional dependency).
+  select coalesce(jsonb_agg(jsonb_build_object(
+           'bucket', to_char(x.bucket_date, 'YYYY-MM'),
+           'actual', x.actual,
+           'budget', coalesce(bd.amount, 0)
+         ) order by x.bucket_date), '[]'::jsonb) as data
   from (
-    select to_char(date_trunc('month', p.work_date), 'YYYY-MM') as bucket,
-           round(sum(p.total_amount), 2) as actual,
-           (select coalesce(sum(b.amount), 0)
-              from public.budgets b, params
-             where b.hotel_id = params.hotel_id
-               and make_date(b.period_year, b.period_month, 1)
-                   = date_trunc('month', p.work_date)::date) as budget
-    from pay p group by 1
+    select date_trunc('month', p.work_date) as bucket_date,
+           round(sum(p.total_amount), 2) as actual
+    from pay p
+    group by 1
   ) x
+  left join lateral (
+    select coalesce(sum(b.amount), 0) as amount
+    from public.budgets b, params
+    where b.hotel_id = params.hotel_id
+      and make_date(b.period_year, b.period_month, 1) = x.bucket_date
+  ) bd on true
 ),
 attendance_mix as (
   select coalesce(jsonb_agg(x order by x.total desc), '[]'::jsonb) as data

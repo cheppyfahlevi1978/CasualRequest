@@ -27,10 +27,12 @@ export async function GET() {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
-    // A count against an RLS-protected table proves the connection and the
-    // policy engine are alive without returning any row.
+    // health_check() is the one function anon is deliberately granted
+    // EXECUTE on (every table grant is revoked from anon in migration 07),
+    // so it is the only way this endpoint can prove DB connectivity without
+    // either exposing data or reporting "error" on a healthy database.
     const [db, auth, storage] = await Promise.allSettled([
-      supabase.from("app_config").select("key", { count: "exact", head: true }),
+      supabase.rpc("health_check"),
       supabase.auth.getSession(),
       supabase.storage.listBuckets(),
     ]);
