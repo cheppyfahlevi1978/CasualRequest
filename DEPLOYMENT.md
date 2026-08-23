@@ -167,10 +167,16 @@ Untuk membatasi domain email perusahaan, isi `ALLOWED_EMAIL_DOMAINS` di Vercel
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | prod | staging | staging | tidak |
 | `NEXT_PUBLIC_APP_URL` | domain production | biarkan kosong | `http://localhost:3000` | tidak |
 | `NEXT_PUBLIC_APP_ENV` | `production` | `preview` | `development` | tidak |
+| `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED` | `true` hanya setelah provider Google aktif | idem | `false` | tidak |
 | `SUPABASE_SERVICE_ROLE_KEY` | prod | staging | staging | **ya** |
 | `ALLOWED_EMAIL_DOMAINS` | domain perusahaan | idem | kosong | ya |
 | `EMAIL_API_KEY`, `EMAIL_FROM` | opsional | opsional | opsional | ya |
 | `CRON_SECRET` | string acak | string acak | — | ya |
+
+`NEXT_PUBLIC_GOOGLE_AUTH_ENABLED` sengaja default `false`. Selama provider
+Google belum dikonfigurasi di Supabase Auth, tombol "Masuk dengan Google"
+disembunyikan dan server action-nya menolak, sehingga login email + kata sandi
+menjadi satu-satunya jalur yang ditawarkan.
 
 Aturan yang tidak boleh dilanggar:
 
