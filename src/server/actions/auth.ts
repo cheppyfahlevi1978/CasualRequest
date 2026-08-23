@@ -273,7 +273,7 @@ export async function signUpWithPassword(
     password,
     options: {
       data: { full_name: fullName },
-      emailRedirectTo: `${base}/auth/callback?next=/access-denied`,
+      emailRedirectTo: `${base}/auth/callback?next=/dashboard`,
     },
   });
 
@@ -281,10 +281,18 @@ export async function signUpWithPassword(
     return { error: await handleError(error, { module: "auth", action: "signUp" }) };
   }
 
-  // Confirmation disabled on the project: the session exists immediately, but
-  // the profile is still 'pending', so send them somewhere that says so.
-  if (data.session) {
-    redirect("/access-denied?reason=inactive");
+  // Confirmation disabled on the project: the session exists immediately. A
+  // normal sign-up is still 'pending' and belongs on Access Denied, but the very
+  // first administrator is activated by the bootstrap trigger, so read the
+  // profile back rather than assuming.
+  if (data.session && data.user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("status")
+      .eq("id", data.user.id)
+      .maybeSingle<{ status: string }>();
+
+    redirect(profile?.status === "active" ? "/dashboard" : "/access-denied?reason=inactive");
   }
 
   return {
