@@ -52,9 +52,11 @@ function GoogleButton() {
 export function LoginForm({
   next,
   initialError,
+  googleEnabled = false,
 }: {
   next?: string;
   initialError?: string;
+  googleEnabled?: boolean;
 }) {
   const [state, action] = useActionState<AuthFormState, FormData>(signInWithPassword, {
     error: initialError,
@@ -63,16 +65,20 @@ export function LoginForm({
 
   return (
     <div className="mt-7 space-y-5">
-      <form action={signInWithGoogle}>
-        <input type="hidden" name="next" value={next ?? "/dashboard"} />
-        <GoogleButton />
-      </form>
+      {googleEnabled ? (
+        <>
+          <form action={signInWithGoogle}>
+            <input type="hidden" name="next" value={next ?? "/dashboard"} />
+            <GoogleButton />
+          </form>
 
-      <div className="flex items-center gap-3 text-[11px] uppercase tracking-wide text-text-faint">
-        <span className="h-px flex-1 bg-border" />
-        atau
-        <span className="h-px flex-1 bg-border" />
-      </div>
+          <div className="flex items-center gap-3 text-[11px] uppercase tracking-wide text-text-faint">
+            <span className="h-px flex-1 bg-border" />
+            atau
+            <span className="h-px flex-1 bg-border" />
+          </div>
+        </>
+      ) : null}
 
       <form action={action} className="space-y-4">
         <input type="hidden" name="next" value={next ?? "/dashboard"} />

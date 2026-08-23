@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LoginForm } from "@/app/login/login-form";
-import { isSupabaseConfigured } from "@/lib/env";
+import { isSupabaseConfigured, publicEnv } from "@/lib/env";
 
 export const metadata: Metadata = { title: "Masuk" };
 
@@ -12,6 +12,7 @@ export default async function LoginPage({
 }) {
   const params = await searchParams;
   const configured = isSupabaseConfigured();
+  const googleEnabled = publicEnv.googleAuthEnabled;
 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
@@ -69,7 +70,9 @@ export default async function LoginPage({
 
           <h2 className="text-2xl font-semibold tracking-tight text-text">Selamat datang</h2>
           <p className="mt-1.5 text-sm text-text-muted">
-            Masuk menggunakan akun kantor Anda untuk melanjutkan.
+            {googleEnabled
+              ? "Masuk menggunakan akun kantor Anda untuk melanjutkan."
+              : "Masuk dengan email dan kata sandi akun Anda untuk melanjutkan."}
           </p>
 
           {!configured ? (
@@ -82,7 +85,11 @@ export default async function LoginPage({
               </p>
             </div>
           ) : (
-            <LoginForm next={params.next} initialError={params.error} />
+            <LoginForm
+              next={params.next}
+              initialError={params.error}
+              googleEnabled={googleEnabled}
+            />
           )}
 
           <p className="mt-8 text-center text-sm text-text-muted">

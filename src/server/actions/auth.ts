@@ -68,6 +68,15 @@ export async function signInWithPassword(
 
 export async function signInWithGoogle(formData: FormData): Promise<void> {
   const next = String(formData.get("next") ?? "/dashboard");
+
+  // Hiding the button is not authorization (PRD §63): refuse here too when the
+  // provider has not been configured, so a hand-crafted POST cannot reach it.
+  if (!publicEnv.googleAuthEnabled) {
+    redirect(
+      `/login?error=${encodeURIComponent("Login Google belum diaktifkan. Gunakan email dan kata sandi.")}`,
+    );
+  }
+
   const supabase = await createClient();
   const base = await origin();
 

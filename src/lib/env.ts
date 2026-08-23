@@ -25,6 +25,14 @@ export const publicEnv = {
   get appUrl() {
     return process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   },
+  /**
+   * Google Workspace sign-in is only offered when the provider has actually been
+   * configured in Supabase Auth. Left off, the button would send people to a
+   * dead end, so e-mail + password stays the only visible path (PRD §41).
+   */
+  get googleAuthEnabled() {
+    return process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === "true";
+  },
   get appEnv() {
     return (process.env.NEXT_PUBLIC_APP_ENV ?? "development") as
       | "development"
