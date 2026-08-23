@@ -58,7 +58,16 @@ export async function signInWithPassword(
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
-    // Never reveal whether the address exists.
+    // An unconfirmed address is not a wrong password, and saying so saves the
+    // user from hunting for a typo that is not there. Everything else stays
+    // deliberately vague so the form never reveals whether an address exists.
+    if (error.code === "email_not_confirmed") {
+      return {
+        error:
+          "Email ini belum diverifikasi. Buka tautan verifikasi yang dikirim saat pendaftaran, " +
+          "atau minta Super Admin memverifikasi akun Anda.",
+      };
+    }
     return { error: "Email atau kata sandi salah." };
   }
 
