@@ -5,6 +5,7 @@ import { publicEnv, isSupabaseConfigured } from "@/lib/env";
 /** Routes reachable without a session. */
 const PUBLIC_PREFIXES = [
   "/login",
+  "/register",
   "/auth",
   "/access-denied",
   "/api/health",
@@ -12,7 +13,11 @@ const PUBLIC_PREFIXES = [
   "/reset-password",
 ];
 
+/** Reachable without a session, and pointless once you have one. */
+const GUEST_ONLY = new Set(["/", "/login", "/register"]);
+
 function isPublic(pathname: string): boolean {
+  if (pathname === "/") return true; // public landing page
   return PUBLIC_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 }
 
@@ -67,7 +72,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && pathname === "/login") {
+  if (user && GUEST_ONLY.has(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     url.search = "";

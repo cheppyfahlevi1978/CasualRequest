@@ -1,0 +1,412 @@
+/* ==========================================================================
+   CASUAL REQUEST — Public landing page
+   Visual direction: "Atrium" — cool marble, brass rules, symmetric plates.
+
+   Scoped entirely under .atrium so the marketing palette never leaks into the
+   application shell, which keeps its own Soft Cloud tokens (globals.css).
+   ========================================================================== */
+
+.atrium {
+  --atr-bg: #e9eae5;
+  --atr-bg-2: #f3f4f0;
+  --atr-plate: #fdfdfb;
+  --atr-ink: #14211c;
+  --atr-ink-2: #2c3b34;
+  --atr-muted: #6e7a73;
+  --atr-brass: #a9884e;
+  --atr-brass-2: #96773f;
+  --atr-rule: rgb(20 33 28 / 0.16);
+  --atr-display: var(--font-marcellus), Georgia, "Times New Roman", serif;
+
+  background: var(--atr-bg);
+  color: var(--atr-ink);
+  font-weight: 300;
+  /* The app shell paints its own darker ground on <body>; cover it fully so a
+     short viewport never shows two different backgrounds. */
+  min-height: 100vh;
+  display: flow-root;
+}
+
+.dark .atrium {
+  --atr-bg: #101714;
+  --atr-bg-2: #16201c;
+  --atr-plate: #1a2521;
+  --atr-ink: #e7eae6;
+  --atr-ink-2: #c3ccc6;
+  --atr-muted: #8d9a93;
+  --atr-brass: #c6a870;
+  --atr-brass-2: #d8bd8a;
+  --atr-rule: rgb(231 234 230 / 0.15);
+}
+
+.atr-wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 clamp(18px, 4vw, 54px);
+}
+
+.atr-kicker {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--atr-brass);
+}
+
+.atr-brass-rule {
+  width: 52px;
+  height: 1px;
+  background: var(--atr-brass);
+  margin: 22px auto;
+  border: 0;
+}
+
+/* --- navigation ---------------------------------------------------------- */
+
+.atr-nav {
+  border-bottom: 1px solid var(--atr-rule);
+}
+.atr-nav-in {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 20px;
+  padding: 22px 0;
+}
+.atr-nleft,
+.atr-nright {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+.atr-nright {
+  justify-content: flex-end;
+}
+.atr-nav-in a {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--atr-ink-2);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.atr-nav-in a:hover {
+  color: var(--atr-brass);
+}
+.atr-crest {
+  text-align: center;
+  line-height: 1;
+}
+.atr-crest b {
+  display: block;
+  font-family: var(--atr-display);
+  font-size: 20px;
+  letter-spacing: 0.3em;
+  font-weight: 400;
+}
+.atr-crest span {
+  display: block;
+  margin-top: 7px;
+  font-size: 8.5px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--atr-muted);
+}
+
+/* --- buttons ------------------------------------------------------------- */
+
+.atr-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 12px 22px;
+  border: 1px solid var(--atr-ink);
+  background: none;
+  color: var(--atr-ink);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.22s, color 0.22s, border-color 0.22s;
+}
+.atr-btn:hover {
+  background: var(--atr-ink);
+  color: var(--atr-bg-2);
+}
+.atr-btn-brass {
+  background: var(--atr-brass);
+  border-color: var(--atr-brass);
+  color: #fffdf7;
+}
+.atr-btn-brass:hover {
+  background: var(--atr-brass-2);
+  border-color: var(--atr-brass-2);
+  color: #fffdf7;
+}
+.atr-cta {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 34px;
+}
+
+/* --- hero ---------------------------------------------------------------- */
+
+.atr-hero {
+  text-align: center;
+  padding: clamp(56px, 10vh, 116px) 0 clamp(40px, 6vh, 72px);
+}
+.atr-hero h1 {
+  font-family: var(--atr-display);
+  font-weight: 400;
+  font-size: clamp(38px, 6vw, 84px);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  margin: 26px auto 0;
+  max-width: 15ch;
+  text-wrap: balance;
+}
+.atr-hero h1 em {
+  font-style: italic;
+  font-family: inherit;
+  color: var(--atr-brass);
+}
+.atr-lede {
+  margin: 0 auto;
+  max-width: 56ch;
+  font-size: 15.5px;
+  line-height: 1.9;
+  color: var(--atr-ink-2);
+}
+
+/* --- plate --------------------------------------------------------------- */
+
+.atr-plate-out {
+  padding: 0 0 clamp(48px, 8vh, 96px);
+}
+.atr-plate {
+  background: var(--atr-plate);
+  border: 1px solid var(--atr-rule);
+  padding: clamp(16px, 2.4vw, 28px);
+  box-shadow: 0 30px 60px -50px rgb(20 33 28 / 0.8);
+  position: relative;
+}
+.atr-plate::before {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  border: 1px solid rgb(169 136 78 / 0.28);
+  pointer-events: none;
+}
+.atr-plate-h {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 8px 10px 18px;
+  border-bottom: 1px solid var(--atr-rule);
+}
+.atr-plate-h h2 {
+  font-family: var(--atr-display);
+  font-size: 19px;
+  margin: 0;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+.atr-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+.atr-col {
+  padding: 26px 22px;
+  border-right: 1px solid var(--atr-rule);
+}
+.atr-col:last-child {
+  border-right: 0;
+}
+.atr-col .atr-n {
+  font-family: var(--atr-display);
+  font-size: 13px;
+  color: var(--atr-brass);
+  letter-spacing: 0.2em;
+}
+.atr-col h3 {
+  font-family: var(--atr-display);
+  font-size: 21px;
+  font-weight: 400;
+  margin: 12px 0 10px;
+}
+.atr-col p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--atr-muted);
+}
+
+/* --- figures ------------------------------------------------------------- */
+
+.atr-figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  border-top: 1px solid var(--atr-rule);
+  border-bottom: 1px solid var(--atr-rule);
+}
+.atr-fig {
+  padding: clamp(28px, 4vw, 44px) 20px;
+  text-align: center;
+  border-right: 1px solid var(--atr-rule);
+}
+.atr-fig:last-child {
+  border-right: 0;
+}
+.atr-fig b {
+  display: block;
+  font-family: var(--atr-display);
+  font-size: clamp(32px, 4.2vw, 48px);
+  font-weight: 400;
+  color: var(--atr-brass);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.atr-fig span {
+  display: block;
+  margin-top: 12px;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--atr-muted);
+}
+
+/* --- editorial ----------------------------------------------------------- */
+
+.atr-edit {
+  padding: clamp(56px, 9vh, 110px) 0;
+  text-align: center;
+}
+.atr-edit h2 {
+  font-family: var(--atr-display);
+  font-weight: 400;
+  font-size: clamp(26px, 3.6vw, 46px);
+  margin: 20px auto 0;
+  max-width: 20ch;
+  text-wrap: balance;
+}
+.atr-quote {
+  max-width: 60ch;
+  margin: 32px auto 0;
+  font-size: 16px;
+  line-height: 2;
+  color: var(--atr-ink-2);
+  font-style: italic;
+}
+.atr-roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+  gap: 1px;
+  background: var(--atr-rule);
+  margin-top: clamp(38px, 6vh, 66px);
+  border: 1px solid var(--atr-rule);
+}
+.atr-role {
+  background: var(--atr-bg-2);
+  padding: 24px 18px;
+  text-align: left;
+}
+.atr-role h3 {
+  font-family: var(--atr-display);
+  font-size: 16px;
+  font-weight: 400;
+  margin: 0 0 8px;
+}
+.atr-role p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--atr-muted);
+}
+
+/* --- footer -------------------------------------------------------------- */
+
+.atr-foot {
+  background: #14211c;
+  color: #e9eae5;
+  padding: clamp(56px, 9vh, 110px) 0 30px;
+  text-align: center;
+}
+.atr-foot .atr-kicker {
+  color: #c6a870;
+}
+.atr-foot h2 {
+  font-family: var(--atr-display);
+  font-weight: 400;
+  font-size: clamp(28px, 4.2vw, 54px);
+  margin: 22px auto 18px;
+  max-width: 18ch;
+  text-wrap: balance;
+}
+.atr-foot p {
+  margin: 0 auto 32px;
+  max-width: 50ch;
+  font-size: 14px;
+  line-height: 1.9;
+  color: rgb(233 234 229 / 0.66);
+}
+.atr-foot .atr-btn {
+  border-color: rgb(233 234 229 / 0.4);
+  color: #e9eae5;
+}
+.atr-foot .atr-btn:hover {
+  background: #e9eae5;
+  color: #14211c;
+}
+.atr-foot .atr-btn-brass {
+  background: #a9884e;
+  border-color: #a9884e;
+  color: #fffdf7;
+}
+.atr-foot .atr-btn-brass:hover {
+  background: #96773f;
+  border-color: #96773f;
+  color: #fffdf7;
+}
+.atr-fine {
+  margin-top: 56px;
+  padding-top: 22px;
+  border-top: 1px solid rgb(233 234 229 / 0.14);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(233 234 229 / 0.42);
+}
+
+@media (max-width: 860px) {
+  .atr-nav-in {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 16px;
+  }
+  .atr-nleft {
+    display: none;
+  }
+  .atr-nright {
+    justify-content: center;
+  }
+  .atr-col {
+    border-right: 0;
+    border-bottom: 1px solid var(--atr-rule);
+  }
+  .atr-col:last-child {
+    border-bottom: 0;
+  }
+  .atr-fig {
+    border-right: 0;
+    border-bottom: 1px solid var(--atr-rule);
+  }
+  .atr-fig:last-child {
+    border-bottom: 0;
+  }
+}

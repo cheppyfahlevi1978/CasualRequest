@@ -204,3 +204,83 @@ export async function setTheme(theme: "light" | "dark" | "system"): Promise<void
     await supabase.from("profiles").update({ theme }).eq("id", user.id);
   }
 }
+
+const signUpSchema = z
+  .object({
+    fullName: z
+      .string()
+      .trim()
+      .min(3, "Nama lengkap minimal 3 karakter")
+      .max(120, "Nama lengkap terlalu panjang"),
+    email: z.string().trim().toLowerCase().email("Format email tidak valid"),
+    password: z
+      .string()
+      .min(10, "Kata sandi minimal 10 karakter")
+      .regex(/[a-z]/, "Harus memuat huruf kecil")
+      .regex(/[A-Z]/, "Harus memuat huruf besar")
+      .regex(/[0-9]/, "Harus memuat angka"),
+    confirm: z.string(),
+  })
+  .refine((v) => v.password === v.confirm, {
+    message: "Konfirmasi kata sandi tidak cocok",
+    path: ["confirm"],
+  });
+
+/**
+ * Self-service registration (PRD §40, §41, §42).
+ *
+ * Signing up only creates the identity. `app.handle_new_auth_user()` inserts the
+ * matching profile with status 'pending', so a fresh account carries no role, no
+ * hotel, and therefore no data access until an administrator activates it. That
+ * is deliberate: registration is not authorization.
+ */
+export async function signUpWithPassword(
+  _prev: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
+  const parsed = signUpSchema.safeParse({
+    fullName: formData.get("fullName"),
+    email: formData.get("email"),
+    password: formData.get("password"),
+    confirm: formData.get("confirm"),
+  });
+
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? "Data pendaftaran tidak valid" };
+  }
+
+  const { fullName, email, password } = parsed.data;
+
+  const allowed = serverEnv.allowedEmailDomains;
+  if (allowed.length > 0 && !allowed.some((d) => email.endsWith(`@${d}`))) {
+    return { error: "Domain email ini tidak diizinkan mendaftar." };
+  }
+
+  const supabase = await createClient();
+  const base = await origin();
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { full_name: fullName },
+      emailRedirectTo: `${base}/auth/callback?next=/access-denied`,
+    },
+  });
+
+  if (error) {
+    return { error: await handleError(error, { module: "auth", action: "signUp" }) };
+  }
+
+  // Confirmation disabled on the project: the session exists immediately, but
+  // the profile is still 'pending', so send them somewhere that says so.
+  if (data.session) {
+    redirect("/access-denied?reason=inactive");
+  }
+
+  return {
+    notice:
+      "Pendaftaran diterima. Periksa email Anda untuk tautan verifikasi, lalu tunggu Super Admin " +
+      "menetapkan peran dan unit hotel sebelum aplikasi dapat digunakan.",
+  };
+}

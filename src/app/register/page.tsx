@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { LoginForm } from "@/app/login/login-form";
+import { RegisterForm } from "@/app/register/register-form";
 import { isSupabaseConfigured } from "@/lib/env";
 
-export const metadata: Metadata = { title: "Masuk" };
+export const metadata: Metadata = { title: "Daftar" };
 
-export default async function LoginPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ next?: string; error?: string }>;
-}) {
-  const params = await searchParams;
+const STEPS = [
+  "Buat akun dengan email kantor dan kata sandi Anda",
+  "Verifikasi email melalui tautan yang kami kirim",
+  "Super Admin menetapkan peran dan unit hotel Anda",
+  "Modul terbuka sesuai peran tersebut",
+];
+
+export default function RegisterPage() {
   const configured = isSupabaseConfigured();
 
   return (
@@ -33,24 +35,21 @@ export default async function LoginPage({
         </div>
 
         <div className="relative max-w-md">
-          <h1 className="text-4xl font-semibold leading-tight tracking-tight">Casual Request</h1>
+          <h1 className="text-4xl font-semibold leading-tight tracking-tight">Daftar akun</h1>
           <p className="mt-4 text-sm leading-relaxed text-white/80">
-            Satu platform yang menghubungkan Department, HR, Management, Finance, dan Casual
-            Worker dalam satu alur kerja digital yang cepat, transparan, aman, dan terlacak.
+            Pendaftaran terbuka untuk seluruh staf hotel. Akun baru dibuat dalam status menunggu,
+            lalu diaktifkan oleh Super Admin sesuai peran dan unit hotel Anda.
           </p>
-          <ul className="mt-8 space-y-2.5 text-sm text-white/75">
-            {[
-              "Pengajuan dan approval casual tanpa WhatsApp",
-              "Database casual dan talent pool terpusat",
-              "Absensi, perhitungan jam kerja, dan biaya otomatis",
-              "Dashboard manpower & budget real-time",
-            ].map((line) => (
-              <li key={line} className="flex gap-2.5">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-white/60" />
+          <ol className="mt-8 space-y-3 text-sm text-white/75">
+            {STEPS.map((line, i) => (
+              <li key={line} className="flex gap-3">
+                <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-white/15 text-[11px] font-semibold">
+                  {i + 1}
+                </span>
                 {line}
               </li>
             ))}
-          </ul>
+          </ol>
         </div>
 
         <p className="relative text-xs text-white/50">
@@ -58,7 +57,7 @@ export default async function LoginPage({
         </p>
       </section>
 
-      {/* Right: sign-in form */}
+      {/* Right: registration form */}
       <section className="flex items-center justify-center bg-bg px-5 py-12 sm:px-10">
         <div className="w-full max-w-sm">
           <div className="mb-8 lg:hidden">
@@ -67,9 +66,12 @@ export default async function LoginPage({
             </span>
           </div>
 
-          <h2 className="text-2xl font-semibold tracking-tight text-text">Selamat datang</h2>
+          <h2 className="text-2xl font-semibold tracking-tight text-text">Buat akun</h2>
           <p className="mt-1.5 text-sm text-text-muted">
-            Masuk menggunakan akun kantor Anda untuk melanjutkan.
+            Sudah punya akun?{" "}
+            <Link href="/login" className="font-medium text-primary hover:underline">
+              Masuk di sini
+            </Link>
           </p>
 
           {!configured ? (
@@ -77,23 +79,16 @@ export default async function LoginPage({
               <p className="font-semibold">Konfigurasi belum lengkap</p>
               <p className="mt-1 text-xs opacity-90">
                 Isi <code>NEXT_PUBLIC_SUPABASE_URL</code> dan{" "}
-                <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> pada environment sebelum login dapat
-                digunakan.
+                <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> pada environment sebelum pendaftaran
+                dapat digunakan.
               </p>
             </div>
           ) : (
-            <LoginForm next={params.next} initialError={params.error} />
+            <RegisterForm />
           )}
 
-          <p className="mt-8 text-center text-sm text-text-muted">
-            Belum punya akun?{" "}
-            <Link href="/register" className="font-medium text-primary hover:underline">
-              Daftar di sini
-            </Link>
-          </p>
-
-          <p className="mt-3 text-center text-xs text-text-faint">
-            Butuh akses?{" "}
+          <p className="mt-8 text-center text-xs text-text-faint">
+            Ada kendala?{" "}
             <Link href="/help" className="font-medium text-primary hover:underline">
               Hubungi HR / Super Admin
             </Link>
